@@ -9,23 +9,22 @@ const bcrypt = require("bcrypt");
 
 //signup
 router.post("/signup", (req, res) => {
-    let { name, email, password, phone, dateOfBirth, bloodGroup, sex } =
+    let { fullName, email, password, phone, dateOfBirth, bloodGroup, sex } =
         req.body;
-    name = name.trim();
-    email = email.toLowerCase();
+    fullName = fullName.trim();
+    email = email.trim();
     password = password.trim();
-    phone = phone.trim();
+    phone = phone;
     dateOfBirth = dateOfBirth.trim();
     bloodGroup = bloodGroup.trim();
     sex = sex.trim();
 
     if (
-        (name =
-            "" ||
-            email == "" ||
-            password == "" ||
-            dateOfBirth == "" ||
-            bloodGroup == "")
+        fullName == "" ||
+        email == "" ||
+        password == "" ||
+        dateOfBirth == "" ||
+        bloodGroup == ""
     ) {
         res.json({
             status: "FAILED",
@@ -65,7 +64,7 @@ router.post("/signup", (req, res) => {
                         .hash(password, saltRounds)
                         .then((hashedPassword) => {
                             const newUser = new User({
-                                name,
+                                fullName,
                                 email,
                                 password: hashedPassword,
                                 phone,
