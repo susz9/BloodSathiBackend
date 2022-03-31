@@ -19,13 +19,7 @@ router.post("/signup", (req, res) => {
     bloodGroup = bloodGroup.trim();
     sex = sex.trim();
 
-    if (
-        fullName == "" ||
-        email == "" ||
-        password == "" ||
-        dateOfBirth == "" ||
-        bloodGroup == ""
-    ) {
+    if (fullName == "" || email == "" || password == "" || dateOfBirth == "") {
         res.json({
             status: "FAILED",
             message: "Empty input fields!",
