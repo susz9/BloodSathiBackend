@@ -9,8 +9,17 @@ const bcrypt = require("bcrypt");
 
 //signup
 router.post("/signup", (req, res) => {
-    let { fullName, email, password, phone, dateOfBirth, bloodGroup, sex } =
-        req.body;
+    let {
+        fullName,
+        phone,
+        email,
+        password,
+        dateOfBirth,
+        bloodGroup,
+        sex,
+        address,
+        location,
+    } = req.body;
     fullName = fullName.trim();
     email = email.trim();
     password = password.trim();
@@ -18,6 +27,8 @@ router.post("/signup", (req, res) => {
     dateOfBirth = dateOfBirth.trim();
     bloodGroup = bloodGroup.trim();
     sex = sex.trim();
+    address = address.trim();
+    location = location;
 
     if (fullName == "" || email == "" || password == "" || dateOfBirth == "") {
         res.json({
@@ -29,7 +40,7 @@ router.post("/signup", (req, res) => {
             status: "FAILED",
             message: "Invalid email entered",
         });
-    } else if (!new Date(dateOfBirth).getTime()) {
+    } else if (!new Date(dateOfBirth)) {
         res.json({
             status: "FAILED",
             message: "Invalid date of birth entered",
@@ -59,12 +70,14 @@ router.post("/signup", (req, res) => {
                         .then((hashedPassword) => {
                             const newUser = new User({
                                 fullName,
+                                phone,
                                 email,
                                 password: hashedPassword,
-                                phone,
                                 dateOfBirth,
                                 bloodGroup,
                                 sex,
+                                address,
+                                location,
                             });
 
                             newUser
@@ -158,6 +171,65 @@ router.post("/signin", (req, res) => {
                     message: "An error occured while checking existing user.",
                 });
             });
+    }
+});
+
+//check account
+router.post("/checkUser", (req, res) => {
+    let { email, phone } = req.body;
+    email = email.trim();
+
+    if (email !== "") {
+        User.find({ email })
+            .then((data) => {
+                if (data.length) {
+                    // user exists
+                    res.json({
+                        status: "SUCCESS",
+                        message: "Signin successful.",
+                        data: data,
+                    });
+                } else {
+                    res.json({
+                        status: "FAILED",
+                        message: "User does not exist",
+                    });
+                }
+            })
+            .catch((err) => {
+                res.json({
+                    status: "FAILED",
+                    message: "An error occured while checking existing user.",
+                });
+            });
+    } else if (phone !== "") {
+        User.find({ phone })
+            .then((data) => {
+                if (data.length) {
+                    // user exists
+                    res.json({
+                        status: "SUCCESS",
+                        message: "Signin successful.",
+                        data: data,
+                    });
+                } else {
+                    res.json({
+                        status: "FAILED",
+                        message: "User does not exist",
+                    });
+                }
+            })
+            .catch((err) => {
+                res.json({
+                    status: "FAILED",
+                    message: "An error occured while checking existing user.",
+                });
+            });
+    } else {
+        res.json({
+            status: "FAILED",
+            message: "Empty credentials. Please try Again.",
+        });
     }
 });
 

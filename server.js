@@ -15,6 +15,10 @@ app.use(express.json());
 const UserRouter = require("./api/User");
 app.use("/user", UserRouter);
 
+//donor-location routes
+const DonorsLocation = require("./api/Location");
+app.use("/user", DonorsLocation);
+
 //console server status check
 app.listen(port, () => {
     console.log(`Server running on port: ${port}`);
