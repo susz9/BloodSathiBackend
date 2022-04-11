@@ -16,8 +16,8 @@ const UserRouter = require("./api/User");
 app.use("/user", UserRouter);
 
 //donor-location routes
-const DonorsLocation = require("./api/Location");
-app.use("/user", DonorsLocation);
+const Search = require("./api/searchDonors");
+app.use("/user", Search);
 
 //console server status check
 app.listen(port, () => {
