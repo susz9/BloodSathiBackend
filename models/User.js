@@ -9,10 +9,14 @@ const UserSchema = new Schema({
     dateOfBirth: Date,
     bloodGroup: String,
     sex: String,
+    district: String,
     address: String,
     location: Object,
     isDonor: Boolean,
     isAvailable: Boolean,
+    userSince: Date,
 });
+
+UserSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("User", UserSchema);

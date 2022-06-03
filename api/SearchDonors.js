@@ -5,19 +5,25 @@ const router = express.Router();
 const User = require("./..//models/User");
 
 //return search
-router.get("/searchDonors", (req, res) => {
+router.post("/donors", (req, res) => {
+    console.log(req.body);
     let { bloodGroup, coordinates, distance } = req.body;
-    let [latitude, longitude] = coordinates;
+    let { latitude, longitude } = coordinates;
     bloodGroup = bloodGroup.trim();
     distance = distance.trim();
 
+    const METERS_PER_KM = 1000;
     const options = {
-        isDonor: true,
-        isAvailable: true,
+        // isDonor: true,
+        // isAvailable: true,
         bloodGroup: bloodGroup,
         location: {
-            $geoWithin: {
-                $centerSphere: [[longitude, latitude], distance / 6378.1],
+            $nearSphere: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [longitude, latitude],
+                },
+                $maxDistance: distance * METERS_PER_KM,
             },
         },
     };

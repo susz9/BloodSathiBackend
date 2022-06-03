@@ -17,6 +17,7 @@ router.post("/signup", (req, res) => {
         dateOfBirth,
         bloodGroup,
         sex,
+        district,
         address,
         location,
     } = req.body;
@@ -27,10 +28,12 @@ router.post("/signup", (req, res) => {
     dateOfBirth = dateOfBirth.trim();
     bloodGroup = bloodGroup.trim();
     sex = sex.trim();
+    district = district.trim();
     address = address.trim();
     location = location;
+    userSince = new Date();
 
-    if (fullName == "" || email == "" || password == "" || dateOfBirth == "") {
+    if (fullName == "" || email == "" || dateOfBirth == "") {
         res.json({
             status: "FAILED",
             message: "Empty input fields!",
@@ -44,11 +47,6 @@ router.post("/signup", (req, res) => {
         res.json({
             status: "FAILED",
             message: "Invalid date of birth entered",
-        });
-    } else if (password.length < 8) {
-        res.json({
-            status: "FAILED",
-            message: "Password is too short!",
         });
     } else {
         // Checking if user already exists
@@ -76,8 +74,10 @@ router.post("/signup", (req, res) => {
                                 dateOfBirth,
                                 bloodGroup,
                                 sex,
+                                district,
                                 address,
                                 location,
+                                userSince,
                             });
 
                             newUser
@@ -117,7 +117,7 @@ router.post("/signup", (req, res) => {
     }
 });
 
-//sign in
+//sign in with credentials
 router.post("/signin", (req, res) => {
     let { email, password } = req.body;
     email = email.trim();
@@ -174,10 +174,9 @@ router.post("/signin", (req, res) => {
     }
 });
 
-//check account
-router.post("/checkUser", (req, res) => {
+//check user account
+router.post("/check", (req, res) => {
     let { email, phone } = req.body;
-    email = email.trim();
 
     if (email !== "") {
         User.find({ email })
@@ -230,6 +229,128 @@ router.post("/checkUser", (req, res) => {
             status: "FAILED",
             message: "Empty credentials. Please try Again.",
         });
+    }
+});
+
+//get all users
+router.get("/all", async (req, res) => {
+    try {
+        await User.find()
+            .then((data) => {
+                if (data.length) {
+                    // user exists
+                    res.json({
+                        status: "SUCCESS",
+                        message: "User list",
+                        data: data,
+                    });
+                } else {
+                    res.json({
+                        status: "FAILED",
+                        message: "Users not found",
+                    });
+                }
+            })
+            .catch((err) => {
+                res.json({
+                    status: "FAILED",
+                    message: "An error occured while fetching users.",
+                });
+            });
+    } catch (e) {
+        res.send(e);
+    }
+});
+
+//get single users
+router.get("/:id", async (req, res) => {
+    try {
+        await User.findById(req.params.id)
+            .then((data) => {
+                if (!data.length) {
+                    // user exists
+                    res.json({
+                        status: "SUCCESS",
+                        message: "User Details",
+                        data: data,
+                    });
+                } else {
+                    res.json({
+                        status: "FAILED",
+                        message: "User not found",
+                    });
+                }
+            })
+            .catch((err) => {
+                res.json({
+                    status: "FAILED",
+                    message: "An error occured while fetching user.",
+                });
+            });
+    } catch (e) {
+        res.send(e);
+    }
+});
+
+//update user
+router.put("/update/:id", async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+            .then((data) => {
+                console.log(data);
+                if (data) {
+                    // user exists
+                    res.json({
+                        status: "SUCCESS",
+                        message: "User details updated",
+                        data: data,
+                    });
+                } else {
+                    res.json({
+                        status: "FAILED",
+                        message: "User not found",
+                    });
+                }
+            })
+            .catch((err) => {
+                res.json({
+                    status: "FAILED",
+                    message: "An error occured while updating user.",
+                });
+            });
+    } catch (e) {
+        res.send(e);
+    }
+});
+
+//delete user
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.params.id)
+            .then((data) => {
+                if (data) {
+                    // user exists
+                    res.json({
+                        status: "SUCCESS",
+                        message: "User sucessfuly deleted.",
+
+                        data: data,
+                    });
+                } else {
+                    res.json({
+                        status: "FAILED",
+                        message: "User deletion failed.",
+                    });
+                }
+            })
+            .catch((err) => {
+                res.json({
+                    status: "FAILED",
+                    message: "An error occured fetching user.",
+                });
+            });
+    } catch (e) {
+        res.send(e);
     }
 });
 
